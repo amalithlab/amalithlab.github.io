@@ -19,7 +19,8 @@
                 <li><a href="#ide">Aetherproof IDE</a></li>
                 <li><a href="#research">Research</a></li>
                 <li><a href="#team">Team</a></li>
-                <li><a href="https://github.com/amalithlab" class="btn btn-outline">GitHub</a></li>
+                <li><a href="https://github.com/amalithlab/aetherproof" class="btn btn-outline">GitHub</a></li>
+                <li><a href="https://github.com/amalithlab/aetherproof/releases/tag/latest-dev" class="btn btn-primary">Download</a></li>
             </ul>
         </div>
     </nav>
@@ -28,10 +29,10 @@
         <div class="container hero-content">
             <div class="hero-text animate-up">
                 <h1>From Vibe to <span class="accent">Veracity</span></h1>
-                <p class="subtitle">Pioneering the future of AI-driven software engineering and security through rigorous Chain-of-Thought frameworks.</p>
+                <p class="subtitle">Pioneering the future of AI-driven software engineering, multi-agent swarms, and codebase verification through rigorous Chain-of-Thought frameworks.</p>
                 <div class="hero-cta">
-                    <a href="https://github.com/amalithlab/aetherproof" class="btn btn-primary">Get Aetherproof</a>
-                    <a href="#philosophy" class="btn btn-secondary">Explore the Vision</a>
+                    <a href="https://github.com/amalithlab/aetherproof/releases/tag/latest-dev" class="btn btn-primary">Download latest-dev</a>
+                    <a href="https://github.com/amalithlab/aetherproof" class="btn btn-secondary">Explore GitHub</a>
                 </div>
             </div>
             <div class="hero-image animate-fade">
@@ -46,11 +47,11 @@
             <div class="grid grid-2">
                 <div class="card glass animate-left">
                     <h3>The Vibe</h3>
-                    <p>Intuitive, LLM-based coding that captures the intent and "vibe" of a project. It's fast, creative, and transformative, but often lacks the rigor needed for production-grade security and reliability.</p>
+                    <p>Intuitive, prompt-driven AI coding that captures high-level intent. It's lightning-fast and highly creative, but fundamentally lacks the formal logic, testing structure, and security guarantees required for production-grade software.</p>
                 </div>
                 <div class="card glass animate-right">
                     <h3>The Veracity</h3>
-                    <p>Our research introduces a <strong>Chain-of-Thought (CoT-Vibe)</strong> framework that bridges the gap, translating intuitive prompts into verifiable, secure, and robust software systems.</p>
+                    <p>Our research introduces a <strong>Chain-of-Thought (CoT-Vibe)</strong> orchestration system that bridges this gap. It translates intuitive instructions into highly validated, secure, and robust systems using autonomous agent verification loops.</p>
                 </div>
             </div>
         </div>
@@ -61,15 +62,15 @@
             <div class="flex-center-vertical grid-2">
                 <div class="ide-text animate-left">
                     <h2 class="section-title">Aetherproof IDE</h2>
-                    <p>Experience the research in action. Aetherproof is an autonomous, AI-driven IDE designed to handle complex coding tasks with global codebase awareness and native Git management.</p>
+                    <p>Experience research-driven orchestration in action. Aetherproof is a state-of-the-art, multi-agent autonomous IDE designed for robust execution, formal check cycles, and native development safety.</p>
                     <ul class="feature-list">
-                        <li>Global Codebase Awareness</li>
-                        <li>Autonomous Browser Subagents</li>
-                        <li>Native GitHub/Git Integration</li>
-                        <li>Robust CI/CD Automation</li>
+                        <li><strong>Adversarial Swarm Orchestration:</strong> Active peer-debate loops between Lead Architects, Coders, Plan Critics (Red Team), and Verifiers powered by LangGraph.</li>
+                        <li><strong>Tailored Swarm Modes:</strong> Custom workspace presets for <em>Software Development</em>, <em>Academic / Document Synthesis</em> (papers and NSF proposals), and <em>Workflow Automation</em>.</li>
+                        <li><strong>Playwright Research Subagents:</strong> Native headless browser subagents for visual verification, web crawling, and automated online literature lookup.</li>
+                        <li><strong>Self-Correcting Verification:</strong> Multi-turn code compilation, unit testing, and lint checking integrated directly into the workspace generation pipeline.</li>
                     </ul>
-                    <div class="release-info">
-                        <p>Available on <a href="https://github.com/amalithlab/aetherproof" class="link">GitHub Releases</a> and the <a href="#" class="link">VS Code Marketplace</a>.</p>
+                    <div class="release-info" style="margin-top: 2rem;">
+                        <p>Available now on <a href="https://github.com/amalithlab/aetherproof/releases/tag/latest-dev" class="link">GitHub Releases (latest-dev)</a>.</p>
                     </div>
                 </div>
                 <div class="ide-preview animate-right">
@@ -80,13 +81,16 @@
                             <span class="dot green"></span>
                         </div>
                         <div class="window-content">
-                            <pre><code><span class="keyword">class</span> <span class="class">Amalithlab</span> {
-  <span class="keyword">constructor</span>() {
-    <span class="keyword">this</span>.mode = <span class="string">'vibe'</span>;
+                            <pre><code><span class="keyword">class</span> <span class="class">AetherproofSwarm</span> {
+  <span class="keyword">constructor</span>(mode = <span class="string">'document'</span>) {
+    <span class="keyword">this</span>.mode = mode;
+    <span class="keyword">this</span>.safeguards = <span class="keyword">true</span>;
   }
 
-  <span class="function">achieveVeracity</span>() {
-    <span class="keyword">return</span> <span class="keyword">this</span>.applyCoTFramework();
+  <span class="keyword">async</span> <span class="function">executeTask</span>(goal) {
+    <span class="keyword">const</span> plan = <span class="keyword">await</span> <span class="keyword">this</span>.architect.plan(goal);
+    <span class="keyword">const</span> verified = <span class="keyword">await</span> <span class="keyword">this</span>.critic.review(plan);
+    <span class="keyword">return</span> verified ? <span class="string">'Veracity Achieved'</span> : <span class="keyword">this</span>.refine();
   }
 }</code></pre>
                         </div>
@@ -111,8 +115,8 @@
     <section id="open-source" class="section bg-gradient">
         <div class="container text-center">
             <h2 class="section-title text-white">Open Source for All</h2>
-            <p class="text-white max-width-md mx-auto mb-4">We believe the future of AI coding belongs to everyone. Amalithlab is an open-source initiative, and we welcome contributions from developers, researchers, and enthusiasts worldwide.</p>
-            <a href="https://github.com/amalithlab" class="btn btn-white">Contribute on GitHub</a>
+            <p class="text-white max-width-md mx-auto mb-4">We believe the future of AI coding belongs to everyone. Aetherproof is an open-source initiative, and we welcome contributions from developers, researchers, and enthusiasts worldwide.</p>
+            <a href="https://github.com/amalithlab/aetherproof" class="btn btn-white">Contribute on GitHub</a>
         </div>
     </section>
 
@@ -139,7 +143,7 @@
             <div class="footer-logo">AMALITH<span>LAB</span></div>
             <div class="footer-copy">&copy; 2026 Amalithlab. All rights reserved.</div>
             <div class="footer-social">
-                <a href="https://github.com/amalithlab">GitHub</a>
+                <a href="https://github.com/amalithlab/aetherproof">GitHub</a>
                 <a href="https://webpages.charlotte.edu/yonwang/">Website</a>
             </div>
         </div>
