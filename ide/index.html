@@ -277,39 +277,93 @@
         <label>Branch</label>
         <input type="text" id="gh-branch" value="main">
       </div>
-      <div class="input-group" style="margin-bottom: 12px;">
+      <div class="input-group">
         <label>Personal Access Token (PAT)</label>
         <input type="password" id="gh-token" placeholder="ghp_...">
       </div>
     </div>
 
     <div>
-      <div class="section-title">Swarm Settings</div>
+      <div class="section-title">Execution Mode</div>
       <div class="input-group" style="margin-bottom: 12px;">
         <label>Swarm Mode</label>
         <select id="swarm-mode">
-          <option value="Adversarial Swarm">Adversarial Swarm</option>
-          <option value="Round Table Swarm">Round Table Swarm</option>
-          <option value="Solo Agent">Solo Agent</option>
+          <option value="Adversarial Swarm">Adversarial Swarm (4-Agents)</option>
+          <option value="Round Table Swarm">Round Table Swarm (Collaborative)</option>
+          <option value="Solo Agent">Solo Agent (Single-Agent)</option>
         </select>
       </div>
       <div class="input-group" style="margin-bottom: 12px;">
         <label>Swarm Type</label>
         <select id="swarm-type">
-          <option value="document">Document Proposal</option>
-          <option value="software">Software Engineering</option>
-          <option value="automation">Automation Scripting</option>
-          <option value="system">System Optimization</option>
+          <option value="software">Software Development</option>
+          <option value="document">Document Synthesis & Proposals</option>
+          <option value="automation">Process Automation</option>
+          <option value="system">Companion Helpers</option>
         </select>
       </div>
+    </div>
+
+    <div>
+      <div class="section-title">Provider Registry</div>
       <div class="input-group" style="margin-bottom: 12px;">
-        <label>Primary Provider</label>
-        <select id="swarm-provider">
-          <option value="google">Google (Gemini)</option>
-          <option value="openai">OpenAI (GPT-4o)</option>
-          <option value="anthropic">Anthropic (Claude 3.5)</option>
-        </select>
+        <label>Select Provider Platform</label>
+        <select id="provider-selector"></select>
       </div>
+      
+      <div id="provider-config-area" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 10px;">
+        <div class="input-group">
+          <label>API Key</label>
+          <input type="password" id="provider-key" placeholder="Enter key...">
+        </div>
+        <div class="input-group">
+          <label>Endpoint URL</label>
+          <input type="text" id="provider-url" placeholder="https://api...">
+        </div>
+        <div class="input-group">
+          <label>Model Name</label>
+          <input type="text" id="provider-model" placeholder="e.g. gpt-4o">
+        </div>
+        <button id="save-provider-btn" style="height: 36px; font-size: 12px; margin-top: 5px;">Save Provider Settings</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Swarm Allocation</div>
+      <div class="input-group" style="margin-bottom: 12px;">
+        <label id="primary-provider-label">Global Swarm Default</label>
+        <select id="primary-provider"></select>
+      </div>
+      <div id="swarm-roles-section" style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="input-group" id="group-architect">
+          <label id="label-architect">Architect Role</label>
+          <select id="role-architect" class="role-selector">
+            <option value="global">Use Swarm Default</option>
+          </select>
+        </div>
+        <div class="input-group" id="group-coder">
+          <label id="label-coder">Coder Role</label>
+          <select id="role-coder" class="role-selector">
+            <option value="global">Use Swarm Default</option>
+          </select>
+        </div>
+        <div class="input-group" id="group-critic">
+          <label id="label-critic">Critic Role</label>
+          <select id="role-critic" class="role-selector">
+            <option value="global">Use Swarm Default</option>
+          </select>
+        </div>
+        <div class="input-group" id="group-verifier">
+          <label id="label-verifier">Verifier Role</label>
+          <select id="role-verifier" class="role-selector">
+            <option value="global">Use Swarm Default</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Limits & Optimizations</div>
       <div class="input-group" style="margin-bottom: 12px;">
         <label>Recursion Limit</label>
         <input type="number" id="swarm-recursion" value="100" min="1" max="500">
@@ -317,62 +371,6 @@
       <div class="input-group" style="flex-direction: row; align-items: center; gap: 8px;">
         <input type="checkbox" id="swarm-reformulate" checked style="width: auto;">
         <label for="swarm-reformulate" style="cursor: pointer;">Reformulate Prompts</label>
-      </div>
-    </div>
-
-    <div>
-      <div class="section-title">Role Model Mapping</div>
-      <div class="input-group" style="margin-bottom: 12px;">
-        <label>Architect Role</label>
-        <select id="role-architect">
-          <option value="global">Use Primary Provider</option>
-          <option value="google">Google (Gemini)</option>
-          <option value="openai">OpenAI</option>
-          <option value="anthropic">Anthropic</option>
-        </select>
-      </div>
-      <div class="input-group" style="margin-bottom: 12px;">
-        <label>Coder Role</label>
-        <select id="role-coder">
-          <option value="global">Use Primary Provider</option>
-          <option value="google">Google (Gemini)</option>
-          <option value="openai">OpenAI</option>
-          <option value="anthropic">Anthropic</option>
-        </select>
-      </div>
-      <div class="input-group" style="margin-bottom: 12px;">
-        <label>Critic Role</label>
-        <select id="role-critic">
-          <option value="global">Use Primary Provider</option>
-          <option value="google">Google (Gemini)</option>
-          <option value="openai">OpenAI</option>
-          <option value="anthropic">Anthropic</option>
-        </select>
-      </div>
-      <div class="input-group">
-        <label>Verifier Role</label>
-        <select id="role-verifier">
-          <option value="global">Use Primary Provider</option>
-          <option value="google">Google (Gemini)</option>
-          <option value="openai">OpenAI</option>
-          <option value="anthropic">Anthropic</option>
-        </select>
-      </div>
-    </div>
-
-    <div>
-      <div class="section-title">Provider Keys</div>
-      <div class="input-group" style="margin-bottom: 12px;">
-        <label>Gemini API Key</label>
-        <input type="password" id="key-gemini" placeholder="AIzaSy...">
-      </div>
-      <div class="input-group" style="margin-bottom: 12px;">
-        <label>OpenAI API Key</label>
-        <input type="password" id="key-openai" placeholder="sk-proj-...">
-      </div>
-      <div class="input-group">
-        <label>Anthropic API Key</label>
-        <input type="password" id="key-anthropic" placeholder="sk-ant-...">
       </div>
     </div>
   </div>
@@ -407,40 +405,248 @@
 
   <script src="bundle.js"></script>
   <script>
-    // Toggle Sidebar visibility
+    // --- Providers Master Registry ---
+    const PROVIDERS = [
+        { id: 'deepseek', label: 'DeepSeek', url: 'https://api.deepseek.com' },
+        { id: 'anthropic', label: 'Anthropic Claude', url: 'https://api.anthropic.com' },
+        { id: 'openai', label: 'OpenAI GPT', url: 'https://api.openai.com/v1' },
+        { id: 'google', label: 'Google Gemini', url: 'https://generativelanguage.googleapis.com' },
+        { id: 'qianwen', label: 'Qianwen (Alibaba)', url: 'https://dashscope.aliyuncs.com/compatible-mode/v1' },
+        { id: 'mistral', label: 'Mistral AI', url: 'https://api.mistral.ai/v1' },
+        { id: 'groq', label: 'Groq', url: 'https://api.groq.com/openai/v1' },
+        { id: 'together', label: 'Together AI', url: 'https://api.together.xyz/v1' },
+        { id: 'openrouter', label: 'OpenRouter', url: 'https://openrouter.ai/api/v1' },
+        { id: 'perplexity', label: 'Perplexity', url: 'https://api.perplexity.ai' },
+        { id: 'moonshot', label: 'Moonshot (Kimi)', url: 'https://api.moonshot.cn/v1' },
+        { id: 'minimax', label: 'MiniMax', url: 'https://api.minimax.io/v1' },
+        { id: 'zhipu', label: 'Zhipu (GLM)', url: 'https://open.bigmodel.cn/api/paas/v4' },
+        { id: 'aws', label: 'AWS Bedrock', url: '' },
+        { id: 'azure', label: 'Azure OpenAI', url: '' },
+        { id: 'cloudflare', label: 'Cloudflare AI', url: '' },
+        { id: 'local1', label: 'Local Node 1', url: 'http://localhost:11434/v1' },
+        { id: 'local2', label: 'Local Node 2', url: 'http://localhost:1234/v1' },
+        { id: 'local3', label: 'Local Node 3', url: 'http://localhost:1235/v1' },
+        { id: 'local4', label: 'Local Node 4', url: 'http://localhost:1236/v1' },
+        { id: 'unified_hub', label: 'Unified Gateway Hub', url: 'http://localhost:18789/v1' }
+    ];
+
+    // Load saved settings maps
+    let providerKeys = JSON.parse(localStorage.getItem('providerKeys') || '{}');
+    let providerUrls = JSON.parse(localStorage.getItem('providerUrls') || '{}');
+    let providerModels = JSON.parse(localStorage.getItem('providerModels') || '{}');
+
+    // UI Element References
     const sidebar = document.getElementById('sidebar');
     const settingsToggle = document.getElementById('settings-toggle');
+    const providerSelector = document.getElementById('provider-selector');
+    const providerKeyInput = document.getElementById('provider-key');
+    const providerUrlInput = document.getElementById('provider-url');
+    const providerModelInput = document.getElementById('provider-model');
+    const saveProviderBtn = document.getElementById('save-provider-btn');
+    const primaryProvider = document.getElementById('primary-provider');
+    const swarmMode = document.getElementById('swarm-mode');
+    const swarmType = document.getElementById('swarm-type');
+    const swarmRolesSection = document.getElementById('swarm-roles-section');
 
+    const roleArchitect = document.getElementById('role-architect');
+    const roleCoder = document.getElementById('role-coder');
+    const roleCritic = document.getElementById('role-critic');
+    const roleVerifier = document.getElementById('role-verifier');
+
+    // Toggle Sidebar
     settingsToggle.addEventListener('click', () => {
       sidebar.classList.toggle('collapsed');
     });
 
-    // Load/Save saved settings from local storage
-    const textFields = [
-      'gh-owner', 'gh-repo', 'gh-branch', 'gh-token', 
-      'key-gemini', 'key-openai', 'key-anthropic',
-      'swarm-mode', 'swarm-type', 'swarm-provider', 'swarm-recursion',
-      'role-architect', 'role-coder', 'role-critic', 'role-verifier'
-    ];
+    // Populate registry selector
+    function initRegistrySelector() {
+      providerSelector.innerHTML = '';
+      PROVIDERS.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = providerKeys[p.id] ? `${p.label} ✓` : p.label;
+        providerSelector.appendChild(opt);
+      });
+      loadSelectedProviderConfig();
+    }
+
+    function loadSelectedProviderConfig() {
+      const id = providerSelector.value;
+      const provider = PROVIDERS.find(p => p.id === id);
+      providerKeyInput.value = providerKeys[id] || '';
+      providerUrlInput.value = providerUrls[id] || (provider ? provider.url : '');
+      providerModelInput.value = providerModels[id] || '';
+    }
+
+    providerSelector.addEventListener('change', loadSelectedProviderConfig);
+
+    saveProviderBtn.addEventListener('click', () => {
+      const id = providerSelector.value;
+      const key = providerKeyInput.value.trim();
+      const url = providerUrlInput.value.trim();
+      const model = providerModelInput.value.trim();
+
+      if (key) {
+        providerKeys[id] = key;
+      } else {
+        delete providerKeys[id];
+      }
+
+      if (url) {
+        providerUrls[id] = url;
+      } else {
+        delete providerUrls[id];
+      }
+
+      if (model) {
+        providerModels[id] = model;
+      } else {
+        delete providerModels[id];
+      }
+
+      localStorage.setItem('providerKeys', JSON.stringify(providerKeys));
+      localStorage.setItem('providerUrls', JSON.stringify(providerUrls));
+      localStorage.setItem('providerModels', JSON.stringify(providerModels));
+
+      initRegistrySelector();
+      populateSwarmDropdowns();
+      alert('Provider settings saved successfully.');
+    });
+
+    // Populate Allocation Dropdowns
+    function populateSwarmDropdowns() {
+      const activePrimary = localStorage.getItem('primaryProvider') || 'google';
+      const activeArchitect = localStorage.getItem('roleArchitect') || 'global';
+      const activeCoder = localStorage.getItem('roleCoder') || 'global';
+      const activeCritic = localStorage.getItem('roleCritic') || 'global';
+      const activeVerifier = localStorage.getItem('roleVerifier') || 'global';
+
+      const updateSelect = (selectEl, isRole = false, savedVal = '') => {
+        selectEl.innerHTML = '';
+        if (isRole) {
+          const globalOpt = document.createElement('option');
+          globalOpt.value = 'global';
+          globalOpt.textContent = 'Use Swarm Default';
+          selectEl.appendChild(globalOpt);
+        }
+
+        PROVIDERS.forEach(p => {
+          const isConfigured = !!providerKeys[p.id] || p.id.startsWith('local') || p.id === 'unified_hub';
+          if (!isConfigured && p.id !== savedVal) return;
+
+          const opt = document.createElement('option');
+          opt.value = p.id;
+          opt.textContent = providerKeys[p.id] ? `${p.label} ✓` : p.label;
+          selectEl.appendChild(opt);
+        });
+
+        selectEl.value = savedVal || selectEl.options[0]?.value;
+      };
+
+      updateSelect(primaryProvider, false, activePrimary);
+      updateSelect(roleArchitect, true, activeArchitect);
+      updateSelect(roleCoder, true, activeCoder);
+      updateSelect(roleCritic, true, activeCritic);
+      updateSelect(roleVerifier, true, activeVerifier);
+    }
+
+    // Dynamic Swarm UI Hide / Renaming
+    function updateSwarmModeUI() {
+      const mode = swarmMode.value;
+      const isSolo = mode === 'Solo Agent';
+      swarmRolesSection.style.display = isSolo ? 'none' : 'flex';
+      
+      const label = document.getElementById('primary-provider-label');
+      if (isSolo) {
+        label.textContent = 'Solo Agent LLM Provider';
+      } else {
+        label.textContent = 'Global Swarm Default';
+      }
+      
+      if (!isSolo) {
+        updateSwarmTypeUI();
+      }
+    }
+
+    function updateSwarmTypeUI() {
+      const type = swarmType.value;
+      const mode = swarmMode.value;
+      const isRoundTable = mode === 'Round Table Swarm';
+
+      const groupArchitect = document.getElementById('group-architect');
+      const groupCoder = document.getElementById('group-coder');
+      const groupCritic = document.getElementById('group-critic');
+      const groupVerifier = document.getElementById('group-verifier');
+
+      const labelArchitect = document.getElementById('label-architect');
+      const labelCoder = document.getElementById('label-coder');
+      const labelCritic = document.getElementById('label-critic');
+      const labelVerifier = document.getElementById('label-verifier');
+
+      if (isRoundTable) {
+        groupArchitect.style.display = 'flex';
+        labelArchitect.textContent = 'Partner A (Primary Collaborator)';
+        
+        groupCoder.style.display = 'flex';
+        labelCoder.textContent = 'Partner B (Peer Collaborator)';
+        
+        groupCritic.style.display = 'none';
+        
+        groupVerifier.style.display = 'flex';
+        labelVerifier.textContent = 'Consensus Auditor (Facilitator)';
+      } else {
+        groupCritic.style.display = (type === 'software' || type === 'system') ? 'flex' : 'none';
+        
+        groupArchitect.style.display = 'flex';
+        labelArchitect.textContent = type === 'document' ? 'Document Architect' : 'Architect Role';
+        
+        groupCoder.style.display = 'flex';
+        labelCoder.textContent = type === 'document' ? 'Domain Specialist (Coder)' : 'Coder Role';
+        
+        groupVerifier.style.display = 'flex';
+        labelVerifier.textContent = type === 'document' ? 'Verification Auditor' : 'Verifier Role';
+      }
+    }
+
+    swarmMode.addEventListener('change', () => {
+      localStorage.setItem('swarmMode', swarmMode.value);
+      updateSwarmModeUI();
+    });
+
+    swarmType.addEventListener('change', () => {
+      localStorage.setItem('swarmType', swarmType.value);
+      updateSwarmTypeUI();
+    });
+
+    // Save allocation selectors changes
+    ['primaryProvider', 'roleArchitect', 'roleCoder', 'roleCritic', 'roleVerifier', 'swarm-recursion'].forEach(f => {
+      const elId = f.startsWith('swarm-') ? f : (f.startsWith('role') ? 'role-' + f.replace('role', '').toLowerCase() : f);
+      const el = document.getElementById(elId);
+      el.addEventListener('change', () => {
+        localStorage.setItem(f, el.value);
+      });
+    });
+
+    // Initialize UI
+    const githubFields = ['gh-owner', 'gh-repo', 'gh-branch', 'gh-token'];
     let hasSavedConfig = true;
-    
-    textFields.forEach(f => {
+    githubFields.forEach(f => {
       const val = localStorage.getItem(f);
       if (val) {
         document.getElementById(f).value = val;
-      } else if (['gh-owner', 'gh-repo', 'gh-token', 'key-gemini'].includes(f)) {
+      } else {
         hasSavedConfig = false;
       }
-      
       document.getElementById(f).addEventListener('input', (e) => {
-        localStorage.setItem(f, e.target.value);
-      });
-      document.getElementById(f).addEventListener('change', (e) => {
         localStorage.setItem(f, e.target.value);
       });
     });
 
-    // Handle check boxes
+    // Load simple fields
+    if (localStorage.getItem('swarmMode')) swarmMode.value = localStorage.getItem('swarmMode');
+    if (localStorage.getItem('swarmType')) swarmType.value = localStorage.getItem('swarmType');
+    if (localStorage.getItem('swarm-recursion')) document.getElementById('swarm-recursion').value = localStorage.getItem('swarm-recursion');
+
     const checkVal = localStorage.getItem('swarm-reformulate');
     if (checkVal !== null) {
       document.getElementById('swarm-reformulate').checked = checkVal === 'true';
@@ -449,14 +655,18 @@
       localStorage.setItem('swarm-reformulate', e.target.checked);
     });
 
-    // Collapse sidebar if settings are already configured, otherwise leave open
-    if (hasSavedConfig) {
+    initRegistrySelector();
+    populateSwarmDropdowns();
+    updateSwarmModeUI();
+
+    if (hasSavedConfig && Object.keys(providerKeys).length > 0) {
       sidebar.classList.add('collapsed');
     } else {
       const welcome = document.getElementById('welcome-message');
-      welcome.innerHTML += `<br><br><span style="color: var(--accent); font-weight: 600;">⚠️ SETUP REQUIRED: Please fill in your credentials in the sidebar first.</span>`;
+      welcome.innerHTML += `<br><br><span style="color: var(--accent); font-weight: 600;">⚠️ SETUP REQUIRED: Please configure your GitHub token and save at least one provider platform key in the sidebar.</span>`;
     }
 
+    // Launch Swarm Actions
     const sendBtn = document.getElementById('send-btn');
     const taskInput = document.getElementById('task-input');
     const chatMessages = document.getElementById('chat-messages');
@@ -488,23 +698,17 @@
         token: document.getElementById('gh-token').value.trim()
       };
 
-      const providerKeys = {
-        gemini: document.getElementById('key-gemini').value.trim(),
-        openai: document.getElementById('key-openai').value.trim(),
-        anthropic: document.getElementById('key-anthropic').value.trim()
-      };
-
       const swarmSettings = {
-        mode: document.getElementById('swarm-mode').value,
-        type: document.getElementById('swarm-type').value,
-        primaryProvider: document.getElementById('swarm-provider').value,
+        mode: swarmMode.value,
+        type: swarmType.value,
+        primaryProvider: primaryProvider.value,
         recursionLimit: Number(document.getElementById('swarm-recursion').value) || 100,
         reformulatePrompts: document.getElementById('swarm-reformulate').checked,
         roles: {
-          architect: document.getElementById('role-architect').value,
-          coder: document.getElementById('role-coder').value,
-          critic: document.getElementById('role-critic').value,
-          verifier: document.getElementById('role-verifier').value
+          architect: roleArchitect.value,
+          coder: roleCoder.value,
+          critic: roleCritic.value,
+          verifier: roleVerifier.value
         }
       };
 
@@ -514,24 +718,22 @@
         return;
       }
 
-      const activeKey = providerKeys.gemini || providerKeys.openai || providerKeys.anthropic;
-      if (!activeKey) {
-        alert('Please provide at least one LLM API key.');
+      // Check if primary provider has a key
+      if (!providerKeys[swarmSettings.primaryProvider] && !swarmSettings.primaryProvider.startsWith('local')) {
+        alert(`Your Swarm Default provider "${swarmSettings.primaryProvider}" does not have an API key saved. Please select it in the Provider Registry and configure it.`);
         sidebar.classList.remove('collapsed');
         return;
       }
 
-      // Hide settings sidebar to focus on the swarm run
       sidebar.classList.add('collapsed');
-
       appendMessage(task, 'user');
       taskInput.value = '';
       sendBtn.disabled = true;
 
-      appendLog(`Launching swarm task: ${task.substring(0, 50)}...`);
+      appendLog(`Launching task: ${task.substring(0, 50)}...`);
 
       try {
-        const result = await window.runWebSwarm(task, ghConfig, providerKeys, swarmSettings, (msg) => {
+        const result = await window.runWebSwarm(task, ghConfig, providerKeys, providerUrls, providerModels, swarmSettings, (msg) => {
           if (msg.type === 'status') {
             appendLog(msg.data.message);
             appendMessage(msg.data.message, 'status');
