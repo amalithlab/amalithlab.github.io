@@ -775,7 +775,13 @@
         }
       } catch (e) {
         verifyStatus.style.color = '#ef4444';
-        verifyStatus.textContent = `❌ Connection Failed: ${e.message}`;
+        let msg = `❌ Connection Failed: ${e.message}`;
+        if (window.location.protocol === 'https:' && endpoint.startsWith('http:')) {
+          msg += `<br><span style="font-size: 10px; color: var(--text-muted); display: block; margin-top: 5px;">Note: You are accessing via HTTPS, but trying to query an insecure HTTP endpoint. The browser blocks this due to Mixed Content Rules. To test local HTTP servers, open the portal locally via <code>file:///</code> scheme or host it locally.</span>`;
+        } else {
+          msg += `<br><span style="font-size: 10px; color: var(--text-muted); display: block; margin-top: 5px;">Ensure the endpoint server is running, reachable, and has CORS enabled (e.g. for Ollama run <code>OLLAMA_ORIGINS="*" ollama serve</code>).</span>`;
+        }
+        verifyStatus.innerHTML = msg;
       } finally {
         verifyProviderBtn.disabled = false;
       }
