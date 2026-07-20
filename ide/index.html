@@ -534,6 +534,26 @@
     </div>
   </div>
 
+  <script>
+    // Define global Node environment variables before loading bundle.js to prevent crashes
+    window.process = {
+      env: {},
+      argv: [],
+      platform: 'browser',
+      cwd: () => '/',
+      nextTick: (fn, ...args) => setTimeout(() => fn(...args), 0),
+      stdout: { write: () => {} },
+      stderr: { write: () => {} },
+      on: () => {},
+      emit: () => {},
+      listeners: () => []
+    };
+    window.Buffer = {
+      isBuffer: () => false,
+      from: () => ({ toString: () => '' }),
+      concat: () => ({ toString: () => '' })
+    };
+  </script>
   <script type="module" src="bundle.js?v=1.0.1"></script>
   <script type="module">
     // --- Providers Master Registry ---
