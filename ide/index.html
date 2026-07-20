@@ -865,52 +865,78 @@
 
       try {
         const actualKey = key || 'dummy-local-token';
-        let endpoint = url || '';
-        let headers = { 'Content-Type': 'application/json' };
+        let baseUrl = (url || '').replace(/\/+$/, '');
+        const modelName = model || 'gpt-4o-mini';
 
+        // Build the chat/completions endpoint URL (avoid double /v1)
+        let chatEndpoint;
         if (provider === 'google') {
-          endpoint = `https://generativelanguage.googleapis.com/v1beta/models?key=${actualKey}`;
-        } else if (provider === 'anthropic') {
-          const base = (endpoint || 'https://api.anthropic.com').replace(/\/+$/, '').replace(/\/v1$/, '');
-          endpoint = base + '/v1/models';
-          headers['x-api-key'] = actualKey;
-          headers['anthropic-version'] = '2023-06-01';
+          // Google uses generateContent, not chat/completions
+          chatEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${actualKey}`;
         } else {
-          endpoint = endpoint.replace(/\/$/, '') + '/models';
-          headers['Authorization'] = `Bearer ${actualKey}`;
+          const base = baseUrl.endsWith('/v1') || baseUrl.endsWith('/v1beta')
+            ? baseUrl
+            : baseUrl + '/v1';
+          chatEndpoint = base + '/chat/completions';
         }
 
-        const res = await fetch(endpoint, {
-          method: 'GET',
-          headers: headers,
-          signal: controller.signal
-        });
+        let fetchOptions;
+        if (provider === 'google') {
+          fetchOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: 'Say OK' }] }], generationConfig: { maxOutputTokens: 5 } }),
+            signal: controller.signal
+          };
+        } else if (provider === 'anthropic') {
+          fetchOptions = {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': actualKey,
+              'anthropic-version': '2023-06-01'
+            },
+            body: JSON.stringify({ model: modelName, max_tokens: 5, messages: [{ role: 'user', content: 'Say OK' }] }),
+            signal: controller.signal
+          };
+        } else {
+          fetchOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${actualKey}` },
+            body: JSON.stringify({ model: modelName, messages: [{ role: 'user', content: 'Say OK' }], max_tokens: 5 }),
+            signal: controller.signal
+          };
+        }
 
+        const res = await fetch(chatEndpoint, fetchOptions);
         clearTimeout(timeoutId);
 
         if (res.ok) {
           verifyStatus.style.color = '#10b981';
-          verifyStatus.textContent = '✅ Connection Verified Successfully!';
+          verifyStatus.textContent = `✅ Connection + Model Verified! (${modelName})`;
         } else {
+          const errText = await res.text().catch(() => res.statusText);
           verifyStatus.style.color = '#ef4444';
-          verifyStatus.textContent = `❌ Verification Failed: HTTP ${res.status}`;
+          verifyStatus.textContent = `❌ API Error ${res.status}: ${errText.substring(0, 120)}`;
         }
       } catch (e) {
         clearTimeout(timeoutId);
         verifyStatus.style.color = '#ef4444';
         let msg = `❌ Connection Failed: ${e.message}`;
         if (e.name === 'AbortError') {
-          msg = `❌ Connection Timed Out (8s). The endpoint might be down or blocked by browser rules.`;
-        } else if (window.location.protocol === 'https:' && endpoint.startsWith('http:')) {
-          msg += `<br><span style="font-size: 10px; color: var(--text-muted); display: block; margin-top: 5px;">Note: You are accessing via HTTPS, but trying to query an insecure HTTP endpoint. The browser blocks this due to Mixed Content Rules. To resolve this, you can install a browser extension like <a href="https://chromewebstore.google.com/search/CORS" target="_blank" style="color: var(--accent); text-decoration: underline;">Allow CORS</a> (ensure "insecure request" or mixed content is allowed in its settings).</span>`;
+          msg = `❌ Timed Out (8s). Endpoint may be down, or browser Mixed Content/CORS rules are blocking the request.`;
+        } else if (window.location.protocol === 'https:' && (url || '').startsWith('http:')) {
+          msg += `<br><span style="font-size: 10px; color: var(--text-muted); display: block; margin-top: 5px;">Mixed Content blocked. Go to Chrome → address bar icon → Site settings → Insecure content → Allow.</span>`;
         } else {
-          msg += `<br><span style="font-size: 10px; color: var(--text-muted); display: block; margin-top: 5px;">This is usually caused by browser CORS blocks. You can bypass this instantly by installing a <a href="https://chromewebstore.google.com/search/CORS" target="_blank" style="color: var(--accent); text-decoration: underline;">CORS Bypass Extension</a> or ensuring your endpoint serves CORS headers.</span>`;
+          msg += `<br><span style="font-size: 10px; color: var(--text-muted); display: block; margin-top: 5px;">Ensure your CORS extension is ON and configured with wildcard (*) origin.</span>`;
         }
         verifyStatus.innerHTML = msg;
       } finally {
         verifyProviderBtn.disabled = false;
       }
     });
+
+
 
     initRegistrySelector();
     populateSwarmDropdowns();
