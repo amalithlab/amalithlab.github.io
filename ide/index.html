@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AETHERPROOF Web IDE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0b0b0f;
+      --panel-bg: rgba(18, 18, 24, 0.75);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent: #00e5ff;
+      --accent-hover: #00b8cc;
+      --sidebar-width: 320px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar Styles */
+    #sidebar {
+      width: var(--sidebar-width);
+      min-width: var(--sidebar-width);
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      overflow-y: auto;
+      gap: 24px;
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #sidebar.collapsed {
+      margin-left: calc(-1 * var(--sidebar-width));
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    .section-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 4px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    input, select {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.15);
+    }
+
+    /* Main Chat Layout */
+    #main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, #0b0b0f 0%, #151520 100%);
+      position: relative;
+    }
+
+    #chat-header {
+      height: 64px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      backdrop-filter: blur(8px);
+      background: rgba(11, 11, 15, 0.5);
+    }
+
+    #chat-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    #settings-toggle {
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 8px 14px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      user-select: none;
+    }
+
+    #settings-toggle:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+      border-color: var(--accent);
+    }
+
+    #chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: var(--accent);
+      color: #000;
+      font-weight: 500;
+    }
+
+    .message.system {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .message.status {
+      align-self: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      padding: 4px;
+    }
+
+    #chat-input-area {
+      padding: 24px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 12px;
+      background: rgba(11, 11, 15, 0.8);
+    }
+
+    textarea {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      resize: none;
+      height: 52px;
+      transition: all 0.2s;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    button {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 0 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    button:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    #log-overlay {
+      height: 150px;
+      border-top: 1px solid var(--border-color);
+      background: rgba(5, 5, 8, 0.95);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 16px;
+      overflow-y: auto;
+      color: #10b981;
+    }
+  </style>
+</head>
+<body>
+  <!-- Settings Sidebar -->
+  <div id="sidebar">
+    <div class="logo">AETHER<span>PROOF</span> Web</div>
+    
+    <div>
+      <div class="section-title">GitHub Config</div>
+      <div class="input-group" style="margin-bottom: 12px;">
+        <label>GitHub Owner / Username</label>
+        <input type="text" id="gh-owner" placeholder="e.g. amalithlab">
+      </div>
+      <div class="input-group" style="margin-bottom: 12px;">
+        <label>Repository Name</label>
+        <input type="text" id="gh-repo" placeholder="e.g. proposal">
+      </div>
+      <div class="input-group" style="margin-bottom: 12px;">
+        <label>Branch</label>
+        <input type="text" id="gh-branch" value="main">
+      </div>
+      <div class="input-group" style="margin-bottom: 12px;">
+        <label>Personal Access Token (PAT)</label>
+        <input type="password" id="gh-token" placeholder="ghp_...">
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Swarm Settings</div>
+      <div class="input-group" style="margin-bottom: 12px;">
+        <label>Swarm Mode</label>
+        <select id="swarm-mode">
+          <option value="Adversarial Swarm">Adversarial Swarm</option>
+          <option value="Round Table Swarm">Round Table Swarm</option>
+          <option value="Solo Agent">Solo Agent</option>
+        </select>
+      </div>
+      <div class="input-group" style="margin-bottom: 12px;">
+        <label>Swarm Type</label>
+        <select id="swarm-type">
+          <option value="document">Document Proposal</option>
+          <option value="software">Software Engineering</option>
+          <option value="automation">Automation Scripting</option>
+          <option value="system">System Optimization</option>
+        </select>
+      </div>
+      <div class="input-group" style="margin-bottom: 12px;">
+        <label>Primary Provider</label>
+        <select id="swarm-provider">
+          <option value="google">Google (Gemini)</option>
+          <option value="openai">OpenAI (GPT-4o)</option>
+          <option value="anthropic">Anthropic (Claude 3.5)</option>
+        </select>
+      </div>
+      <div class="input-group" style="margin-bottom: 12px;">
+        <label>Recursion Limit</label>
+        <input type="number" id="swarm-recursion" value="100" min="1" max="500">
+      </div>
+      <div class="input-group" style="flex-direction: row; align-items: center; gap: 8px;">
+        <input type="checkbox" id="swarm-reformulate" checked style="width: auto;">
+        <label for="swarm-reformulate" style="cursor: pointer;">Reformulate Prompts</label>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Role Model Mapping</div>
+      <div class="input-group" style="margin-bottom: 12px;">
+        <label>Architect Role</label>
+        <select id="role-architect">
+          <option value="global">Use Primary Provider</option>
+          <option value="google">Google (Gemini)</option>
+          <option value="openai">OpenAI</option>
+          <option value="anthropic">Anthropic</option>
+        </select>
+      </div>
+      <div class="input-group" style="margin-bottom: 12px;">
+        <label>Coder Role</label>
+        <select id="role-coder">
+          <option value="global">Use Primary Provider</option>
+          <option value="google">Google (Gemini)</option>
+          <option value="openai">OpenAI</option>
+          <option value="anthropic">Anthropic</option>
+        </select>
+      </div>
+      <div class="input-group" style="margin-bottom: 12px;">
+        <label>Critic Role</label>
+        <select id="role-critic">
+          <option value="global">Use Primary Provider</option>
+          <option value="google">Google (Gemini)</option>
+          <option value="openai">OpenAI</option>
+          <option value="anthropic">Anthropic</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Verifier Role</label>
+        <select id="role-verifier">
+          <option value="global">Use Primary Provider</option>
+          <option value="google">Google (Gemini)</option>
+          <option value="openai">OpenAI</option>
+          <option value="anthropic">Anthropic</option>
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Provider Keys</div>
+      <div class="input-group" style="margin-bottom: 12px;">
+        <label>Gemini API Key</label>
+        <input type="password" id="key-gemini" placeholder="AIzaSy...">
+      </div>
+      <div class="input-group" style="margin-bottom: 12px;">
+        <label>OpenAI API Key</label>
+        <input type="password" id="key-openai" placeholder="sk-proj-...">
+      </div>
+      <div class="input-group">
+        <label>Anthropic API Key</label>
+        <input type="password" id="key-anthropic" placeholder="sk-ant-...">
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Portal -->
+  <div id="main-content">
+    <div id="chat-header">
+      <h2>Active Swarm Workspace</h2>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="font-size: 12px; color: var(--text-muted);">Status: Ready</div>
+        <div id="settings-toggle" title="Toggle Configuration Sidebar">⚙️ Settings</div>
+      </div>
+    </div>
+
+    <div id="chat-messages">
+      <div class="message system" id="welcome-message">
+        Welcome to the AETHERPROOF Web IDE. Fill in your settings in the sidebar to configure your Swarm Modes, Roles, and API credentials.
+        <br><br>
+        <strong>Auto-Repository Feature:</strong> If the repository you specify does not exist, AETHERPROOF will automatically create it as a private repository on your account.
+      </div>
+    </div>
+
+    <div id="log-overlay">
+      [System Status: Online]
+    </div>
+
+    <div id="chat-input-area">
+      <textarea id="task-input" placeholder="Type your proposal requirements or code generation task here..."></textarea>
+      <button id="send-btn">Launch Swarm</button>
+    </div>
+  </div>
+
+  <script src="bundle.js"></script>
+  <script>
+    // Toggle Sidebar visibility
+    const sidebar = document.getElementById('sidebar');
+    const settingsToggle = document.getElementById('settings-toggle');
+
+    settingsToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+    });
+
+    // Load/Save saved settings from local storage
+    const textFields = [
+      'gh-owner', 'gh-repo', 'gh-branch', 'gh-token', 
+      'key-gemini', 'key-openai', 'key-anthropic',
+      'swarm-mode', 'swarm-type', 'swarm-provider', 'swarm-recursion',
+      'role-architect', 'role-coder', 'role-critic', 'role-verifier'
+    ];
+    let hasSavedConfig = true;
+    
+    textFields.forEach(f => {
+      const val = localStorage.getItem(f);
+      if (val) {
+        document.getElementById(f).value = val;
+      } else if (['gh-owner', 'gh-repo', 'gh-token', 'key-gemini'].includes(f)) {
+        hasSavedConfig = false;
+      }
+      
+      document.getElementById(f).addEventListener('input', (e) => {
+        localStorage.setItem(f, e.target.value);
+      });
+      document.getElementById(f).addEventListener('change', (e) => {
+        localStorage.setItem(f, e.target.value);
+      });
+    });
+
+    // Handle check boxes
+    const checkVal = localStorage.getItem('swarm-reformulate');
+    if (checkVal !== null) {
+      document.getElementById('swarm-reformulate').checked = checkVal === 'true';
+    }
+    document.getElementById('swarm-reformulate').addEventListener('change', (e) => {
+      localStorage.setItem('swarm-reformulate', e.target.checked);
+    });
+
+    // Collapse sidebar if settings are already configured, otherwise leave open
+    if (hasSavedConfig) {
+      sidebar.classList.add('collapsed');
+    } else {
+      const welcome = document.getElementById('welcome-message');
+      welcome.innerHTML += `<br><br><span style="color: var(--accent); font-weight: 600;">⚠️ SETUP REQUIRED: Please fill in your credentials in the sidebar first.</span>`;
+    }
+
+    const sendBtn = document.getElementById('send-btn');
+    const taskInput = document.getElementById('task-input');
+    const chatMessages = document.getElementById('chat-messages');
+    const logOverlay = document.getElementById('log-overlay');
+
+    function appendMessage(text, role) {
+      const el = document.createElement('div');
+      el.className = `message ${role}`;
+      el.innerText = text;
+      chatMessages.appendChild(el);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function appendLog(text) {
+      const el = document.createElement('div');
+      el.innerText = `[${new Date().toLocaleTimeString()}] ${text}`;
+      logOverlay.appendChild(el);
+      logOverlay.scrollTop = logOverlay.scrollHeight;
+    }
+
+    sendBtn.addEventListener('click', async () => {
+      const task = taskInput.value.trim();
+      if (!task) return;
+
+      const ghConfig = {
+        owner: document.getElementById('gh-owner').value.trim(),
+        repo: document.getElementById('gh-repo').value.trim(),
+        branch: document.getElementById('gh-branch').value.trim() || 'main',
+        token: document.getElementById('gh-token').value.trim()
+      };
+
+      const providerKeys = {
+        gemini: document.getElementById('key-gemini').value.trim(),
+        openai: document.getElementById('key-openai').value.trim(),
+        anthropic: document.getElementById('key-anthropic').value.trim()
+      };
+
+      const swarmSettings = {
+        mode: document.getElementById('swarm-mode').value,
+        type: document.getElementById('swarm-type').value,
+        primaryProvider: document.getElementById('swarm-provider').value,
+        recursionLimit: Number(document.getElementById('swarm-recursion').value) || 100,
+        reformulatePrompts: document.getElementById('swarm-reformulate').checked,
+        roles: {
+          architect: document.getElementById('role-architect').value,
+          coder: document.getElementById('role-coder').value,
+          critic: document.getElementById('role-critic').value,
+          verifier: document.getElementById('role-verifier').value
+        }
+      };
+
+      if (!ghConfig.owner || !ghConfig.repo || !ghConfig.token) {
+        alert('Please provide all GitHub Configuration fields.');
+        sidebar.classList.remove('collapsed');
+        return;
+      }
+
+      const activeKey = providerKeys.gemini || providerKeys.openai || providerKeys.anthropic;
+      if (!activeKey) {
+        alert('Please provide at least one LLM API key.');
+        sidebar.classList.remove('collapsed');
+        return;
+      }
+
+      // Hide settings sidebar to focus on the swarm run
+      sidebar.classList.add('collapsed');
+
+      appendMessage(task, 'user');
+      taskInput.value = '';
+      sendBtn.disabled = true;
+
+      appendLog(`Launching swarm task: ${task.substring(0, 50)}...`);
+
+      try {
+        const result = await window.runWebSwarm(task, ghConfig, providerKeys, swarmSettings, (msg) => {
+          if (msg.type === 'status') {
+            appendLog(msg.data.message);
+            appendMessage(msg.data.message, 'status');
+          }
+        });
+        appendMessage(`Swarm completed task successfully!`, 'system');
+        appendLog(`Execution completed.`);
+      } catch (e) {
+        appendMessage(`Failed to execute task: ${e.message}`, 'system');
+        appendLog(`Error met: ${e.message}`);
+      } finally {
+        sendBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
