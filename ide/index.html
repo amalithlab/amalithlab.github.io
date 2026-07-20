@@ -470,7 +470,7 @@
         <input type="number" id="swarm-recursion" value="100" min="1" max="500">
       </div>
       <div class="input-group" style="flex-direction: row; align-items: center; gap: 8px;">
-        <input type="checkbox" id="swarm-reformulate" checked style="width: auto;">
+        <input type="checkbox" id="swarm-reformulate" style="width: auto;">
         <label for="swarm-reformulate" style="cursor: pointer;">Reformulate Prompts</label>
       </div>
     </div>
@@ -831,8 +831,14 @@
     });
 
     const checkVal = localStorage.getItem('swarm-reformulate');
-    if (checkVal !== null) {
-      document.getElementById('swarm-reformulate').checked = checkVal === 'true';
+    // Default is OFF to avoid hangs when the architect LLM is not fully configured.
+    // Only restore to checked if user explicitly turned it ON (stored 'true').
+    if (checkVal === 'true') {
+      document.getElementById('swarm-reformulate').checked = true;
+    } else {
+      // Clear any stale 'true' values
+      localStorage.setItem('swarm-reformulate', 'false');
+      document.getElementById('swarm-reformulate').checked = false;
     }
     document.getElementById('swarm-reformulate').addEventListener('change', (e) => {
       localStorage.setItem('swarm-reformulate', e.target.checked);
