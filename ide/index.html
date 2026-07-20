@@ -329,7 +329,34 @@
           <label>Model Name</label>
           <input type="text" id="provider-model" placeholder="e.g. gpt-4o">
         </div>
-        <button id="save-provider-btn" style="height: 36px; font-size: 12px; margin-top: 5px;">Save Provider Settings</button>
+        <div style="display: flex; gap: 8px;">
+          <button id="save-provider-btn" style="flex: 1; height: 36px; font-size: 11px;">Save Settings</button>
+          <button id="verify-provider-btn" style="flex: 1; height: 36px; font-size: 11px; background: rgba(0, 229, 255, 0.1); border: 1px solid var(--accent); color: var(--accent);">Verify Connection</button>
+        </div>
+        <div id="verify-status" style="font-size: 11px; margin-top: 4px; display: none; text-align: center;"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Web Search Config</div>
+      <div class="input-group" style="margin-bottom: 12px;">
+        <label>Search Provider</label>
+        <select id="search-provider">
+          <option value="gemini">Google Gemini Grounding</option>
+          <option value="tavily">Tavily AI Search</option>
+          <option value="exa">Exa Neural Search</option>
+          <option value="google_cse">Google Custom CSE</option>
+          <option value="bing">Microsoft Bing Search</option>
+          <option value="custom">Custom Webhook Endpoint</option>
+        </select>
+      </div>
+      <div class="input-group" style="margin-bottom: 12px;">
+        <label>Search API Key</label>
+        <input type="password" id="search-key" placeholder="Enter key (if required)...">
+      </div>
+      <div class="input-group">
+        <label>Search Endpoint / CX ID</label>
+        <input type="text" id="search-url" placeholder="Enter URL or Custom Search CX ID...">
       </div>
     </div>
 
@@ -656,12 +683,86 @@
     if (localStorage.getItem('swarmType')) swarmType.value = localStorage.getItem('swarmType');
     if (localStorage.getItem('swarm-recursion')) document.getElementById('swarm-recursion').value = localStorage.getItem('swarm-recursion');
 
+    // Load search config fields
+    const searchProviderEl = document.getElementById('search-provider');
+    const searchKeyEl = document.getElementById('search-key');
+    const searchUrlEl = document.getElementById('search-url');
+
+    if (localStorage.getItem('search-provider')) searchProviderEl.value = localStorage.getItem('search-provider');
+    if (localStorage.getItem('search-key')) searchKeyEl.value = localStorage.getItem('search-key');
+    if (localStorage.getItem('search-url')) searchUrlEl.value = localStorage.getItem('search-url');
+
+    ['search-provider', 'search-key', 'search-url'].forEach(f => {
+      const el = document.getElementById(f);
+      el.addEventListener('change', () => localStorage.setItem(f, el.value));
+      el.addEventListener('input', () => localStorage.setItem(f, el.value));
+    });
+
     const checkVal = localStorage.getItem('swarm-reformulate');
     if (checkVal !== null) {
       document.getElementById('swarm-reformulate').checked = checkVal === 'true';
     }
     document.getElementById('swarm-reformulate').addEventListener('change', (e) => {
       localStorage.setItem('swarm-reformulate', e.target.checked);
+    });
+
+    // Verify Provider Connection
+    const verifyProviderBtn = document.getElementById('verify-provider-btn');
+    const verifyStatus = document.getElementById('verify-status');
+
+    verifyProviderBtn.addEventListener('click', async () => {
+      const provider = providerSelector.value;
+      const key = providerKeyInput.value.trim();
+      const url = providerUrlInput.value.trim();
+      const model = providerModelInput.value.trim();
+
+      if (!key && !(provider.startsWith('local') || provider === 'unified_hub')) {
+        verifyStatus.style.display = 'block';
+        verifyStatus.style.color = '#ef4444';
+        verifyStatus.textContent = '❌ API Key is missing.';
+        return;
+      }
+
+      verifyStatus.style.display = 'block';
+      verifyStatus.style.color = 'var(--text-muted)';
+      verifyStatus.textContent = '⚡ Verifying Connection...';
+      verifyProviderBtn.disabled = true;
+
+      try {
+        const actualKey = key || 'dummy-local-token';
+        let endpoint = url || '';
+        let headers = { 'Content-Type': 'application/json' };
+
+        if (provider === 'google') {
+          endpoint = `https://generativelanguage.googleapis.com/v1beta/models?key=${actualKey}`;
+        } else if (provider === 'anthropic') {
+          const base = (endpoint || 'https://api.anthropic.com').replace(/\/+$/, '').replace(/\/v1$/, '');
+          endpoint = base + '/v1/models';
+          headers['x-api-key'] = actualKey;
+          headers['anthropic-version'] = '2023-06-01';
+        } else {
+          endpoint = endpoint.replace(/\/$/, '') + '/models';
+          headers['Authorization'] = `Bearer ${actualKey}`;
+        }
+
+        const res = await fetch(endpoint, {
+          method: 'GET',
+          headers: headers
+        });
+
+        if (res.ok) {
+          verifyStatus.style.color = '#10b981';
+          verifyStatus.textContent = '✅ Connection Verified Successfully!';
+        } else {
+          verifyStatus.style.color = '#ef4444';
+          verifyStatus.textContent = `❌ Verification Failed: HTTP ${res.status}`;
+        }
+      } catch (e) {
+        verifyStatus.style.color = '#ef4444';
+        verifyStatus.textContent = `❌ Connection Failed: ${e.message}`;
+      } finally {
+        verifyProviderBtn.disabled = false;
+      }
     });
 
     initRegistrySelector();
@@ -713,6 +814,9 @@
         primaryProvider: primaryProvider.value,
         recursionLimit: Number(document.getElementById('swarm-recursion').value) || 100,
         reformulatePrompts: document.getElementById('swarm-reformulate').checked,
+        searchProvider: searchProviderEl.value,
+        searchKey: searchKeyEl.value.trim(),
+        searchUrl: searchUrlEl.value.trim(),
         roles: {
           architect: roleArchitect.value,
           coder: roleCoder.value,
