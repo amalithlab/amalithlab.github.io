@@ -410,8 +410,8 @@
     </div>
   </div>
 
-  <script src="bundle.js"></script>
-  <script>
+  <script type="module" src="bundle.js"></script>
+  <script type="module">
     // --- Providers Master Registry ---
     const PROVIDERS = [
         { id: 'deepseek', label: 'DeepSeek', url: 'https://api.deepseek.com' },
@@ -627,11 +627,13 @@
 
     // Save allocation selectors changes
     ['primaryProvider', 'roleArchitect', 'roleCoder', 'roleCritic', 'roleVerifier', 'swarm-recursion'].forEach(f => {
-      const elId = f.startsWith('swarm-') ? f : (f.startsWith('role') ? 'role-' + f.replace('role', '').toLowerCase() : f);
+      const elId = f.startsWith('swarm-') ? f : (f.startsWith('role') ? 'role-' + f.replace('role', '').toLowerCase() : (f === 'primaryProvider' ? 'primary-provider' : f));
       const el = document.getElementById(elId);
-      el.addEventListener('change', () => {
-        localStorage.setItem(f, el.value);
-      });
+      if (el) {
+        el.addEventListener('change', () => {
+          localStorage.setItem(f, el.value);
+        });
+      }
     });
 
     // Initialize UI
