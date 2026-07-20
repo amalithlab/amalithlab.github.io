@@ -280,6 +280,11 @@
       <div class="input-group">
         <label>Personal Access Token (PAT)</label>
         <input type="password" id="gh-token" placeholder="ghp_...">
+        <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px; line-height: 1.4;">
+          Requires the <code>repo</code> scope to read/write files and check/create repositories.
+          <br>
+          <a href="https://github.com/settings/tokens/new?scopes=repo&description=Aetherproof%20Web%20IDE" target="_blank" style="color: var(--accent); text-decoration: none;">Create a token on GitHub ↗</a>
+        </div>
       </div>
     </div>
 
@@ -388,6 +393,8 @@
     <div id="chat-messages">
       <div class="message system" id="welcome-message">
         Welcome to the AETHERPROOF Web IDE. Fill in your settings in the sidebar to configure your Swarm Modes, Roles, and API credentials.
+        <br><br>
+        <strong>GitHub PAT Setup:</strong> To read and write files to your repository, you need a Personal Access Token (Classic) with the <code>repo</code> scope. You can <a href="https://github.com/settings/tokens/new?scopes=repo&description=Aetherproof%20Web%20IDE" target="_blank" style="color: var(--accent); text-decoration: underline;">generate one on GitHub here</a>.
         <br><br>
         <strong>Auto-Repository Feature:</strong> If the repository you specify does not exist, AETHERPROOF will automatically create it as a private repository on your account.
       </div>
