@@ -195,6 +195,74 @@
       padding: 4px;
     }
 
+    .message.reasoning {
+      align-self: flex-start;
+      background: rgba(0, 229, 255, 0.02);
+      border-left: 3px solid var(--accent);
+      border-radius: 4px;
+      color: var(--text-secondary);
+      font-size: 13px;
+      padding: 10px 16px;
+      max-width: 85%;
+    }
+
+    .plan-card {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 16px;
+      width: 100%;
+      max-width: 85%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-sizing: border-box;
+    }
+
+    .plan-card h3 {
+      margin: 0;
+      color: var(--accent);
+      font-size: 15px;
+    }
+
+    .plan-card pre {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 12px;
+      border-radius: 4px;
+      max-height: 250px;
+      overflow-y: auto;
+      margin: 0;
+      font-size: 12px;
+      white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .plan-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .plan-btn {
+      height: 32px;
+      font-size: 12px;
+      padding: 0 16px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .plan-btn.approve {
+      background: #10b981;
+      color: #000;
+    }
+
+    .plan-btn.reject {
+      background: #ef4444;
+      color: #fff;
+    }
+
     #chat-input-area {
       padding: 24px;
       border-top: 1px solid var(--border-color);
@@ -909,6 +977,55 @@
           if (msg.type === 'status') {
             appendLog(msg.data.message);
             appendMessage(msg.data.message, 'status');
+          } else if (msg.type === 'reasoning') {
+            const agentName = msg.data.agent || 'System';
+            const text = msg.data.text || '';
+            appendMessage(`${agentName}: ${text}`, 'reasoning');
+          } else if (msg.type === 'plan_ready') {
+            const planText = msg.data.plan;
+            const card = document.createElement('div');
+            card.className = 'plan-card';
+            card.innerHTML = `
+              <h3>Implementation Plan Created</h3>
+              <pre>${planText}</pre>
+              <div class="plan-actions" id="plan-actions-container" style="margin-top: 10px; display: flex; gap: 8px;">
+                <button class="plan-btn approve" id="plan-approve-btn">Approve & Execute</button>
+                <button class="plan-btn reject" id="plan-reject-btn">Request Revision</button>
+              </div>
+              <div id="plan-feedback-area" style="display: none; flex-direction: column; gap: 8px; margin-top: 8px;">
+                <textarea id="plan-feedback-input" placeholder="Enter revision feedback for the Architect..." style="width:100%; height:60px; box-sizing:border-box; background:#1e1e1e; border:1px solid #333; color:#fff; padding:6px; border-radius:4px; font-size:12px;"></textarea>
+                <button class="plan-btn reject" id="plan-feedback-submit" style="align-self: flex-end;">Submit Feedback</button>
+              </div>
+            `;
+            chatMessages.appendChild(card);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            const approveBtn = card.querySelector('#plan-approve-btn');
+            const rejectBtn = card.querySelector('#plan-reject-btn');
+            const feedbackArea = card.querySelector('#plan-feedback-area');
+            const feedbackInput = card.querySelector('#plan-feedback-input');
+            const feedbackSubmit = card.querySelector('#plan-feedback-submit');
+            const actionsContainer = card.querySelector('#plan-actions-container');
+
+            approveBtn.addEventListener('click', () => {
+              actionsContainer.style.display = 'none';
+              appendMessage('Plan Approved. Commencing implementation...', 'status');
+              window.submitSwarmDecision({ approved: true });
+            });
+
+            rejectBtn.addEventListener('click', () => {
+              rejectBtn.style.display = 'none';
+              feedbackArea.style.display = 'flex';
+            });
+
+            feedbackSubmit.addEventListener('click', () => {
+              const fb = feedbackInput.value.trim();
+              if (!fb) return;
+              actionsContainer.style.display = 'none';
+              feedbackArea.style.display = 'none';
+              appendMessage(`Plan rejected. Feedback: "${fb}"`, 'status');
+              window.submitSwarmDecision({ approved: false, feedback: fb });
+            });
           }
         });
         appendMessage(`Swarm completed task successfully!`, 'system');
