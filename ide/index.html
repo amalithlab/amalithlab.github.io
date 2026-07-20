@@ -424,6 +424,16 @@
         <br><br>
         <strong>GitHub PAT Setup:</strong> To read and write files to your repository, you need a Personal Access Token (Classic) with the <code>repo</code> scope. You can <a href="https://github.com/settings/tokens/new?scopes=repo&description=Aetherproof%20Web%20IDE" target="_blank" style="color: var(--accent); text-decoration: underline;">generate one on GitHub here</a>.
         <br><br>
+        <strong>Connecting Local or Public LLM APIs:</strong> Since this IDE runs in your browser, standard security rules (CORS and Mixed Content) will block direct requests to local HTTP model servers or public API providers.
+        <br>
+        To bypass this and connect successfully:
+        <ul style="margin-top: 6px; padding-left: 20px; line-height: 1.5; font-size: 12px; color: var(--text-secondary);">
+          <li>Install the <a href="https://chromewebstore.google.com/detail/allow-cors-access-control/lhbhchkcommjplnbfbgdlggocjcjilei" target="_blank" style="color: var(--accent); text-decoration: underline;">Allow CORS Chrome Extension</a> (or equivalent for your browser).</li>
+          <li>Click the extension icon in your browser toolbar and toggle it <strong>ON</strong>.</li>
+          <li>Open the extension settings and ensure <strong>"Insecure request"</strong> or <strong>"Mixed Content"</strong> is allowed if you are connecting to a local HTTP endpoint (like <code>http://ccil1s26m8hj6lws:8000/v1</code>).</li>
+          <li>Enter your API key/URL in the sidebar and verify connection!</li>
+        </ul>
+        <br>
         <strong>Auto-Repository Feature:</strong> If the repository you specify does not exist, AETHERPROOF will automatically create it as a private repository on your account.
       </div>
     </div>
