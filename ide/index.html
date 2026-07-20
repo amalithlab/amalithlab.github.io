@@ -744,6 +744,9 @@
       verifyStatus.textContent = '⚡ Verifying Connection...';
       verifyProviderBtn.disabled = true;
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+
       try {
         const actualKey = key || 'dummy-local-token';
         let endpoint = url || '';
@@ -763,8 +766,11 @@
 
         const res = await fetch(endpoint, {
           method: 'GET',
-          headers: headers
+          headers: headers,
+          signal: controller.signal
         });
+
+        clearTimeout(timeoutId);
 
         if (res.ok) {
           verifyStatus.style.color = '#10b981';
@@ -774,9 +780,12 @@
           verifyStatus.textContent = `❌ Verification Failed: HTTP ${res.status}`;
         }
       } catch (e) {
+        clearTimeout(timeoutId);
         verifyStatus.style.color = '#ef4444';
         let msg = `❌ Connection Failed: ${e.message}`;
-        if (window.location.protocol === 'https:' && endpoint.startsWith('http:')) {
+        if (e.name === 'AbortError') {
+          msg = `❌ Connection Timed Out (8s). The endpoint might be down or blocked by browser rules.`;
+        } else if (window.location.protocol === 'https:' && endpoint.startsWith('http:')) {
           msg += `<br><span style="font-size: 10px; color: var(--text-muted); display: block; margin-top: 5px;">Note: You are accessing via HTTPS, but trying to query an insecure HTTP endpoint. The browser blocks this due to Mixed Content Rules. To test local HTTP servers, open the portal locally via <code>file:///</code> scheme or host it locally.</span>`;
         } else {
           msg += `<br><span style="font-size: 10px; color: var(--text-muted); display: block; margin-top: 5px;">Ensure the endpoint server is running, reachable, and has CORS enabled (e.g. for Ollama run <code>OLLAMA_ORIGINS="*" ollama serve</code>).</span>`;
