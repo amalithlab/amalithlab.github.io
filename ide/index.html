@@ -427,12 +427,18 @@
         <strong>Connecting Local or Public LLM APIs:</strong> Since this IDE runs in your browser, standard security rules (CORS and Mixed Content) will block direct requests to local HTTP model servers or public API providers.
         <br>
         To bypass this and connect successfully:
-        <ul style="margin-top: 6px; padding-left: 20px; line-height: 1.5; font-size: 12px; color: var(--text-secondary);">
-          <li>Install a CORS bypass extension (like <a href="https://chromewebstore.google.com/search/CORS" target="_blank" style="color: var(--accent); text-decoration: underline;">Allow CORS on Chrome Web Store</a> or equivalent for your browser).</li>
-          <li>Click the extension icon in your browser toolbar and toggle it <strong>ON</strong>.</li>
-          <li>Open the extension settings and ensure <strong>"Insecure request"</strong> or <strong>"Mixed Content"</strong> is allowed if you are connecting to a local HTTP endpoint (like <code>http://ccil1s26m8hj6lws:8000/v1</code>).</li>
-          <li>Enter your API key/URL in the sidebar and verify connection!</li>
-        </ul>
+        <ol style="margin-top: 6px; padding-left: 20px; line-height: 1.6; font-size: 12px; color: var(--text-secondary);">
+          <li>Install a CORS bypass extension (e.g. search for and install <a href="https://chromewebstore.google.com/search/CORS" target="_blank" style="color: var(--accent); text-decoration: underline; font-weight: bold;">Allow CORS on the Chrome Web Store</a>).</li>
+          <li>Click the extension icon in your browser toolbar and click the <strong>Big Power Button</strong> to toggle it <strong>ON</strong> (icon will turn colored/orange).</li>
+          <li>Open the extension's Options page (right-click its icon -> Options) and configure:
+            <ul style="margin-top: 4px; padding-left: 15px; list-style-type: circle;">
+              <li><strong>Option #3 (Access-Control-Allow-Headers):</strong> Turn <strong>ON</strong>/Check the box for <em>"Add * as the header value"</em> (allows API keys to pass).</li>
+              <li><strong>Option #5 (Access-Control-Allow-Origin):</strong> Set this to <strong><code>*</code></strong> (wildcard) instead of <code>ORIGIN</code>.</li>
+            </ul>
+          </li>
+          <li><strong>Reload</strong> the Web IDE tab in your browser.</li>
+          <li>Enter your provider API keys and click <strong>Verify Connection</strong>!</li>
+        </ol>
         <br>
         <strong>Auto-Repository Feature:</strong> If the repository you specify does not exist, AETHERPROOF will automatically create it as a private repository on your account.
       </div>
